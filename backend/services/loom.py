@@ -143,6 +143,19 @@ class LoomService:
                 provider=provider,
                 model=model,
             ) from exc
+        except Exception as exc:
+            # Safety net: Loom does not wrap every provider SDK error (e.g. an
+            # Anthropic BadRequestError for billing propagates raw). Guarantee
+            # no provider-specific exception escapes this boundary. Treated as
+            # non-retryable since we can't confirm it's transient — only known
+            # transient failures above are marked retryable. (CancelledError is
+            # a BaseException and is intentionally not caught here.)
+            raise LLMServiceError(
+                f"Unexpected error from provider '{provider}': {exc}",
+                retryable=False,
+                provider=provider,
+                model=model,
+            ) from exc
 
         latency_ms = (time.perf_counter() - start) * 1000
         return LLMResult.from_loom(
