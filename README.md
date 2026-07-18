@@ -3,7 +3,7 @@
 A production-shaped AI **voice assistant** where the voice layer never knows which LLM is answering.
 [**Bolna**](https://bolna.ai) handles the phone/voice interface, a **FastAPI** backend orchestrates the conversation, and [**Loom**](https://loom-weaves.vercel.app/docs) is the *single* gateway to every LLM provider — so swapping models or providers is a **config change, not a code change**.
 
-> **Status:** 🚧 Early development. The architecture and Loom integration are defined; backend modules are being built one at a time. This README describes the target design — see [Roadmap](#roadmap) for what's actually implemented.
+> **Status:** 🟢 Backend is runnable end-to-end. Config, Loom service, routing, memory, and the Bolna-facing OpenAI-compatible endpoint are implemented and verified against live provider calls. Remaining: provider failover and deployment notes — see [Roadmap](#roadmap).
 
 ---
 
@@ -122,7 +122,7 @@ python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 
 # 3. Install (loom-router + FastAPI stack)
-pip install "loom-router[all]" fastapi uvicorn pydantic pydantic-settings
+pip install -r requirements.txt
 
 # 4. Configure — copy the example and fill in keys
 cp .env.example .env
@@ -131,7 +131,28 @@ cp .env.example .env
 uvicorn backend.app:app --reload
 ```
 
-Then point your Bolna agent's webhook at the backend's endpoint.
+**Point Bolna at it:** in the Bolna dashboard, add a custom LLM whose base URL is
+your backend's public URL. Bolna speaks the OpenAI protocol, so it will call
+`POST /v1/chat/completions` — the provider is chosen by our routing layer, not Bolna.
+
+**Try the endpoint directly:**
+
+```bash
+curl http://localhost:8000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "X-Conversation-Id: demo-1" \
+  -d '{
+    "model": "bolna-custom",
+    "messages": [
+      {"role": "system", "content": "You are a friendly receptionist."},
+      {"role": "user", "content": "Hi, my name is Ravi. Can you book me a slot?"}
+    ]
+  }'
+```
+
+An optional `X-Conversation-Id` header (or the OpenAI `user` field) lets the
+backend remember facts like the caller's name across turns. Set `"stream": true`
+to receive an OpenAI-style SSE stream.
 
 ## Configuration
 
@@ -151,9 +172,9 @@ All configuration is via environment variables — **no secrets in code**.
 - [x] Loom service (`services/loom.py`) — verified end-to-end call
 - [x] Dynamic routing layer (`services/routing.py`)
 - [x] Conversation memory (`services/memory.py`)
-- [ ] Bolna webhook routes & conversation orchestration
-- [ ] Structured logging (provider, model, latency, tokens, cost)
-- [ ] Provider failover / retry
+- [x] Bolna-facing OpenAI-compatible endpoint (`/v1/chat/completions`, streaming + non-streaming)
+- [x] Structured logging (provider, model, latency, tokens, cost)
+- [ ] Provider failover / retry (error layer already marks failures `retryable`)
 - [ ] Deployment notes
 
 ## License
