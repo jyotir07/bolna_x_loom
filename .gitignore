@@ -1,2 +1,7 @@
 about.md
 CLAUDE.md
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
