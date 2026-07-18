@@ -150,7 +150,7 @@ All configuration is via environment variables — **no secrets in code**.
 - [x] Project scaffolding & config (`config/`, `.env.example`)
 - [x] Loom service (`services/loom.py`) — verified end-to-end call
 - [x] Dynamic routing layer (`services/routing.py`)
-- [ ] Conversation memory (`services/memory.py`)
+- [x] Conversation memory (`services/memory.py`)
 - [ ] Bolna webhook routes & conversation orchestration
 - [ ] Structured logging (provider, model, latency, tokens, cost)
 - [ ] Provider failover / retry
