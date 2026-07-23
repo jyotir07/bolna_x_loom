@@ -92,10 +92,10 @@ from loom import AsyncLoom
 client = AsyncLoom.from_env()  # reads keys from .env + environment
 
 result = await client.generate(
-    provider="openai",         # openai | anthropic | gemini | deepseek | …
+    provider="openai",         # openai | anthropic | gemini | deepseek | etc;
     modality="text",
     model="gpt-4o-mini",       # chosen by the routing layer, not hardcoded
-    prompt="…",
+    prompt="…",     # anything
     params={"temperature": 0.7, "max_tokens": 512},
 )
 
