@@ -4,9 +4,7 @@ A production-shaped AI **voice assistant** where the voice layer never knows whi
 [**Bolna**](https://bolna.ai) handles the phone/voice interface, a **FastAPI** backend orchestrates the conversation, and [**Loom**](https://loom-weaves.vercel.app/docs) is the *single* gateway to every LLM provider — so swapping models or providers is a **config change, not a code change**.
 
 > **Status:** 🟢 Backend is runnable end-to-end. Config, Loom service, routing, memory, and the Bolna-facing OpenAI-compatible endpoint are implemented and verified against live provider calls. Remaining: provider failover and deployment notes — see [Roadmap](#roadmap).
-
 ---
-
 ## Why this project
 
 Most voice-AI stacks hardwire a single LLM SDK throughout the app. Changing model, provider, or routing strategy then means touching business logic everywhere. This project inverts that:
